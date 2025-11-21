@@ -1,0 +1,39 @@
+version: "3.9"
+
+services:
+  mysql:
+    image: mysql:8
+    container_name: learning-center-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${LEARNING_CENTER_MYSQL_PWD}
+      MYSQL_DATABASE: learning-center-da
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+        - backend-net
+
+  backend:
+    image: learning-center-backend:1.0.0
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: learning-center-backend
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+       SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+       LEARNING_CENTER_MYSQL_PWD: ${LEARNING_CENTER_MYSQL_PWD}
+    depends_on:
+      - mysql
+    networks:
+      - backend-net
+
+networks:
+  backend-net:
+
+volumes:
+  mysql_data:
